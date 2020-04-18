@@ -261,14 +261,14 @@ Reverberation is one of the most important effects used in audio production. Alt
 
 \section{Introduction}
 \label{sec:intro}
-Artificial reverberation is one of the most popular audio effects. It is used in music production, sound design, game audio, and movie production to enhance dry recordings with the impression of space. The development of digital artificial reverberation started nearly 60 years ago \cite{schroeder} and since then various improvements as well as different techniques have been introduced \cite{Valimaki:2012}. The designs available nowadays can be roughly divided into three groups: convolution algorithms, delay networks, and physical room models \cite{Valimaki:2012, peters2012, kereliuk2018}\stefania{what about geometric models?} \vesa{I think that physical room models can mean the same thing as geometric models. Not sure.}. 
+Artificial reverberation is one of the most popular audio effects. It is used in music production, sound design, game audio, and movie production to enhance dry recordings with the impression of space. The development of digital artificial reverberation started nearly 60 years ago \cite{schroeder} and since then various improvements as well as different techniques have been introduced \cite{Valimaki:2012}. The designs available nowadays can be roughly divided into three groups: convolution algorithms, delay networks, and physical room models \cite{Valimaki:2012, peters2012, kereliuk2018}\stefania{what about geometric models?} \vesa{I think that physical room models can mean the same thing as geometric models. Not sure.} \karolina{I think they are the same thing}. 
 
 
-The methods involving physical modeling simulate the sound propagation in a specific geometry. Due to their high computational cost, though, they are used mostly in off-line computer simulations of room acoustics \cite{peters2012}. \stefania{maybe some more recent reference from Brian Hamilton? Like @article{bilbao2019passive, title={Passive volumetric time domain simulation for room acoustics applications}, author={Bilbao, Stefan and Hamilton, Brian}, journal={The Journal of the Acoustical Society of America}, volume={145}, number={4}, pages={2613--2624}, year={2019}, publisher={Acoustical Society of America} }} \karolina{Good idea! I will have a loot at this reference.}
+The methods involving physical modeling simulate the sound propagation in a specific geometry. Due to their high computational cost, though, they are used mostly in off-line computer simulations of room acoustics \cite{peters2012}. \stefania{maybe some more recent reference from Brian Hamilton? Like @article{bilbao2019passive, title={Passive volumetric time domain simulation for room acoustics applications}, author={Bilbao, Stefan and Hamilton, Brian}, journal={The Journal of the Acoustical Society of America}, volume={145}, number={4}, pages={2613--2624}, year={2019}, publisher={Acoustical Society of America} }} \karolina{Good idea! I will have a look at this reference.}
 
 The techniques that convolve the input signal with a measured room impulse response (RIR) produce rich, high fidelity reverberation. However, since the RIR samples serve as finite impulse response (FIR) filter's coefficients, with which the dry signal is filtered, the computational cost is high, especially for long RIRs. 
 
-The second \silvin{$\leftarrow$ this used to be third. Correct me if I'm wrong} group of artificial reverberation algorithms are based on networks of delay lines and digital filters. The first example of such reverberator was introduced by Schroeder and Logan \cite{schroeder}, who used feedback comb filter structures to create a sequence of decaying echoes, and a similar architecture using all-pass filters to ensure high echo density without spectral coloration. The development of such structures led to the invention of feedback delay network (FDN) algorithms, which can be regarded as a "vectorized" comb filter \cite{Valimaki:2012}. The FDN as used in its current form was presented in the works of Jot and Chaigne \cite{Jot:Chaine:1991:aes, Jot:Chaine:1996}. 
+The second group of artificial reverberation algorithms are based on networks of delay lines and digital filters. The first example of such reverberator was introduced by Schroeder and Logan \cite{schroeder}, who used feedback comb filter structures to create a sequence of decaying echoes, and a similar architecture using all-pass filters to ensure high echo density without spectral coloration. The development of such structures led to the invention of feedback delay network (FDN) algorithms, which can be regarded as a "vectorized" comb filter \cite{Valimaki:2012}. The FDN as used in its current form was presented in the works of Jot and Chaigne \cite{Jot:Chaine:1991:aes, Jot:Chaine:1996}. 
 
 Over the years, many real-time implementations of artificial reverberation algorithms have been developed. The designs that use a convolution-based approach, however, depend on measured or pre-synthesised RIRs convolved with the signal, which are collected in groups of presets \cite{peters2012, heise2009automatic, borss2009, ableton}. Such VST plugins allow modifying the reverberation by modulating, damping or equalizing the available RIRs. The possibilities are, however, limited by the size of the RIR databases and therefore prove to be relatively inflexible. 
 
@@ -311,7 +311,7 @@ s_i(n + L_i) = \sum_j^N A_{i,j} \widetilde{H}_{i} s_j(n) + b_i x(n),
 %\label{eq:fdn}
 \end{subequations}
 %
-where $y(n)$ and $x(n)$ are the output and input values, respectively, at time sample $n$, and $s_i(n)$ is the output of the $i$th delay line, and $A_{i,j}$ is the element of an $N$th-order feedback matrix $\textbf{A}$, through which all the delay lines are interconnected. Parameters $b_i$ and $c_i$ symbolize output and input coefficients, respectively, $d$ is the direct-path gain, and $\widetilde{H}_{i}$ is the attenuation filter of the $i$th delay line.
+where $y(n)$ and $x(n)$ are the output and input signal, respectively, at time sample $n$, $s_i(n)$ is the output of the $i$th delay line, and $A_{i,j}$ is the element of an $N$th-order feedback matrix $\textbf{A}$, through which all the delay lines are interconnected. Parameters $b_i$ and $c_i$ symbolize input and output coefficients, respectively, $d$ is the direct-path gain, and $\widetilde{H}_{i}$ is the attenuation filter of the $i$th delay line.
 
 
 When designing an FDN, a common practice is to first ensure that the energy of the system will not decay for any possible type of delay. Therefore, the matrix $\textbf{A}$ should be unilossless \cite{Schelcht:Habets:2017:IEEE:lossless:FDN}. To obtain a specific frequency-dependent RT, each of the delay lines must be extended by an attenuation filter, which should approximate the target gain-per-sample expressed by
@@ -321,7 +321,7 @@ When designing an FDN, a common practice is to first ensure that the energy of t
 	\label{eq:gamma}
 \end{equation}
 
-\noindent where $T_{60}(\omega)$ is the target RT in seconds, $\omega = 2\pi f/f_\textrm{s}$ is the normalized frequency, $f$ is the frequency in Hz, and $f_\textrm{s}$ is the sampling rate in Hz. In order to ensure that all delay lines approximate the same RT, the gain-per-sample for each of them should be scaled by a respective delay in samples $L$, so that the following condition is met \silvin{I'm a bit confused with the notation of this guy. This $A$ has nothing to do with $A_{i,j}$ in Eq.~\eqref{1b} right? Also, how does $A_\text{db}$ appear in the other equations (/ the grand scheme)?}: 
+\noindent where $T_{60}(\omega)$ is the target RT in seconds, $\omega = 2\pi f/f_\textrm{s}$ is the normalized frequency, $f$ is the frequency in Hz, and $f_\textrm{s}$ is the sampling rate in Hz. In order to ensure that all delay lines approximate the same RT, the gain-per-sample for each of them should be scaled by a respective delay in samples $L$, so that the following condition is met \silvin{I'm a bit confused with the notation of the follwing equation. This $A$ has nothing to do with $A_{i,j}$ in Eq.~\eqref{1b} right? Also, how does $A_\text{dB}$ appear in the other equations (/ the grand scheme)?}: 
 \begin{equation}
 	A_\textrm{dB}(\omega)=L\gamma_\textrm{dB}(\omega),
 	\label{eq:attenuation}
@@ -331,14 +331,13 @@ When designing an FDN, a common practice is to first ensure that the energy of t
 
 
 
-In order to provide accurate approximation of the target RT, the attenuation filter used in the FDN implementation in the present study is a graphic equalizer (GEQ), which controls the energy decay of the system is ten octave bands, with center frequencies from 31.25\,Hz to 16\,kHz. The equalizer is composed of second-order peak-notch infinite impulse response (IIR) filters \cite{Orfanidis:2010:introduction:SP} and designed with the method proposed by V\"alim\"aki and Liski \cite{Valimaki:Liski:2017:IEEE:accurate:equalizer} with later modifications, such as scaling by a median of gains and adding a first-order high-shelf filter as proposed in \cite{prawda:2019:improved}. The GEQ response in dB is expressed as 
-
+In order to provide accurate approximation of the target RT, the attenuation filter used in the FDN implementation in the present study is a graphic equalizer (GEQ), which controls the energy decay of the system is ten octave bands, with center frequencies from 31.25\,Hz to 16\,kHz. The equalizer is composed of biquad filters \cite{Orfanidis:2010:introduction:SP} and designed with the method proposed by V\"alim\"aki and Liski \cite{Valimaki:Liski:2017:IEEE:accurate:equalizer} with later modifications, such as scaling by a median of gains and adding a first-order high-shelf filter as proposed in \cite{prawda:2019:improved}. The GEQ response in dB is expressed as \silvin{also this one. Can this be immediately used in Eq. \eqref{1b} or do we need to do some conversion?}
 \begin{equation}
     \widetilde{H}_\textrm{dB}(e^{j\omega}) = g_0+\sum_{m=1}^M \left(H_{\textrm{dB},m}(e^{j\omega})-\frac{g_0}{M}\right),
 	\label{eq:GEQ}
 \end{equation}
 
-\noindent where  $g_0$ is the broadband gain factor, $H_{\textrm{dB},m}$ are the frequency responses of equalizing filters, and $m = 1,2,...,M$ is the frequency-band index with total number of controlled frequency bands $M$.
+\noindent where $g_0$ is the broadband gain factor, $H_{\textrm{dB},m}$ are the frequency responses of the equalizing filters, and $m = 1,2,...,M$ is the frequency-band index with total number of controlled frequency bands $M$.
 
 
 
@@ -346,7 +345,7 @@ In order to provide accurate approximation of the target RT, the attenuation fil
 
 \centering
 \includegraphics[width=\columnwidth]{Figures/FDN.pdf}
-\caption{\textit{Flow diagram of an FDN with $N$ equalized delay lines and their $M$-octave-band biquad filters highlighted. \silvin{add something about the biquad filter structure in the text as well?} \karolina{I will just add one sentence about it, I guess there's no need to describe it in detail.} \silvin{Agreed, but just so that we show what kind of EQ filter we use :)} \karolina{True! I added some info and a reference in paragraph just to the left of this caption :D} \silvin{Nice! Is the filter description you gave identical to calling it a biquad filter?} \karolina{Yes! :)} \silvin{Can we then simply call them biquad filters for clarity?} See Sections \ref{sec:FDN} and \ref{sec:codeStructure} for more detailed information. }}
+\caption{\textit{Flow diagram of an FDN with $N$ equalized delay lines and their $M$-octave-band biquad filters highlighted. See Sections \ref{sec:FDN} and \ref{sec:codeStructure} for more detailed information. }}
 \label{fig:diag}
 \end{figure}
 %\subsection{Parameters}
@@ -354,8 +353,8 @@ In order to provide accurate approximation of the target RT, the attenuation fil
 
 \begin{figure*}[ht!]
     \centering
-    \subfloat[\textit{The attenuation filter's response and the corresponding RT curve. No preset is selected and the} Smooth \textit{button is pressed. }]{\label{fig:gui}{ \includegraphics[width=0.48\textwidth]{Figures/GUIupdated3.png}}} \hfill
-    \subfloat[\textit{The IR of the reverberator Note that the} Fix coeffs \textit{button has been pressed and the presets drop-down menu and sliders have been disabled.}]{\label{fig:gui2}{ \includegraphics[width=0.48\textwidth]{Figures/GUIupdated4.png}}} \hfill
+    \subfloat[\textit{The attenuation filter's response and the corresponding RT curve. No preset is selected and the} Smooth \textit{button is pressed. }]{\label{fig:gui}{ \includegraphics[width=0.48\textwidth]{Figures/GUIupdated6.png}}} \hfill
+    \subfloat[\textit{The IR of the reverberator Note that the} Fix coeffs \textit{button has been pressed and the presets drop-down menu and sliders have been disabled.}]{\label{fig:gui2}{ \includegraphics[width=0.48\textwidth]{Figures/GUIupdated7.png}}} \hfill
     \caption{\textit{GUI of the implemented FDN plugin.}}
     \label{fig:GUIboth}
 \end{figure*}
@@ -385,13 +384,13 @@ As too large differences between two consecutive RT values can cause instability
 
 The \textit{All Sliders} mode allows the user to control all the RT values to be the same by changing the slider position in one of the frequency bands. 
 
-When the \textit{Smooth} mode is activated, changing the value of one RT will also adjust the RT in the other frequency bands. RT values of bands closer to the band that is changed will be more affected than other RT values according to
+When the \textit{Smooth} mode is activated, changing the value of one RT will also adjust the RT in the other frequency bands. RT values of bands closer to the band that is changed will be more affected than other RT values, according to
 \begin{equation}
 T_{60}[m] = T_{60, \textrm{init}}[m] + \Big(T_{60}[m_\text{c}] - T_{60, \textrm{init}}[m_\text{c}]\Big) \cdot \epsilon^{|m-m_\text{c}|},
 \label{eq:smooth}
 \end{equation}
 %
-where $m_\text{c}$ is the index of currently adjusted slider, $T_{60}$  are the final and initial RT values, respectively, and $\epsilon = 0.6$ is a heuristically chosen scaling factor.
+where $m_\text{c}$ is the index of currently adjusted slider, $T_{60}$ and $T_{60, \text{init}}$ are the final and initial RT values, respectively, and $\epsilon = 0.6$ is a heuristically chosen scaling factor.
 
 In order to provide users with typical reverberation examples, five presets were created: \textit{Small Room}, \textit{Medium Room}, \textit{Large Room}, \textit{Concert Hall}, and \textit{Church}. The first three presets are based on the measurements results presented in \cite{jeub09}, whilst RT values for the last two are taken from \cite{air}. All examples are available to choose from a drop-down list in the top part of the GUI. If one of the sliders is changed, \say{-- no preset --} is displayed in the drop-down list, as shown in Fig.~\ref{fig:gui}.
 
@@ -431,13 +430,13 @@ The \textit{Show IR} button located in the top right of the window allows the us
 
 Although FDN-based reverbs are nowadays among the most popular algorithmic reverbs, there is no clear rule on how to choose the lengths of the delay lines \cite{Rocchesso:1997, schlecht:2016:echo}. The common practice is to choose the number of samples that are mutually prime and uniformly distributed between the maximum and minimum lengths to avoid clustering of echoes \cite{schlecht:2016:echo}. 
 
-Through the \textit{Advanced Settings} window shown in Fig.~\ref{fig:advanced}, the distribution of delay-line lengths can be chosen among four options: \textit{Random}, \textit{Gaussian}, \textit{Primes}, and \textit{Uniform} through a drop-down menu (See Fig.~\ref{fig:advanced}). Whenever an option is selected, the delay-line lengths will be randomly generated based on the distribution selected. The generation can be repeated by clicking on the \textit{Randomise} button. Furthermore, the minimum (500 samples) and maximum (10,000 samples) delay-line lengths can be controlled; the minimum difference between the two has been set to 100 samples. 
+Through the \textit{Advanced Settings} window shown in Fig.~\ref{fig:advanced}, the distribution of delay-line lengths can be chosen among four options: \textit{Random}, \textit{Gaussian}, \textit{Primes}, and \textit{Uniform} through a drop-down menu. Whenever an option is selected, the delay-line lengths will be randomly generated based on the distribution selected. The generation can be repeated by clicking on the \textit{Randomise} button. Furthermore, the minimum (500 samples) and maximum (10,000 samples) delay-line lengths can be controlled; the minimum difference between the two has been set to 100 samples. 
 Moreover, there is an option to have the lengths be pre-defined so that the plugin will have the same behaviour every time it is used for all distributions. The minimum and maximum delay-line lengths have been empirically set to 1,500 and 4,500 samples respectively (\texttildelow30-100\,ms with $f_\text{s} =$  44,100\,Hz).
 
 
 \subsection{Choice of Feedback Matrix}
 
-The choice of the feedback matrix is crucial for the FDN algorithm to work correctly. The popular matrix types used in FDN implementations, which fulfill the requirement of being unilossless, are Hadamard, Householder \cite{Jot:1997:icm}, random orthogonal, and identity matrices. Whereas the first three are chosen to enhance specific properties of the algorithm, e.g. density of the impulse response, the identity matrix, however, reduces the FDN to a Schroeder reverberator, or a parallel set of comb filters \cite{Jot:Chaine:1991:aes, menzer2010unitary}. The plugin presented in this study allows the user to choose between those four matrices through a drop-down menu and learn about the differences in the sound obtained by changing this part of the FDN reverberator. %by clicking the button with the matrix name on the side panel in the GUI. The name depicted on the button indicates which of the matrices is currently in use.
+The choice of the feedback matrix is crucial for the FDN algorithm to work correctly. The popular matrix types used in FDN implementations, which fulfill the requirement of being unilossless, are Hadamard, Householder \cite{Jot:1997:icm}, random orthogonal, and identity matrices. Where the first three are chosen to enhance specific properties of the algorithm, e.g. density of the impulse response, the identity matrix, however, reduces the FDN to a Schroeder reverberator, or a parallel set of comb filters \cite{Jot:Chaine:1991:aes, menzer2010unitary}. The plugin presented in this study allows the user to choose between those four matrices through a drop-down menu and learn about the differences in the sound obtained by changing this part of the FDN reverberator. %by clicking the button with the matrix name on the side panel in the GUI. The name depicted on the button indicates which of the matrices is currently in use.
 %
 Additionally, the order of the FDN, and thus the size of the feedback matrix, can be changed. The available options are 2, 4, 8, 16, 32, and 64, which can also be chosen using a drop-down menu. % In the case of Householder, when the order is changed, the delay lines are emptied to prevent any unwanted artefacts. \silvin{moved more down}
 
@@ -447,7 +446,7 @@ In the case of the Householder matrix type, the implementation of matrices of di
 \mathbf{A}_\textrm{N} = \mathbf{I}_\textrm{N} - \frac{2}{N} \mathbf{u}_\textrm{N}\mathbf{u}_\textrm{N}^\textrm{T},
 \label{eq:house}
 \end{equation}
-where $\mathbf{u}_\textrm{N}^\textrm{T} = [1...1]$, and $\mathbf{I}_\textrm{N}$ is the identity matrix \cite{Jot:1997:icm}. The matrix of order 16 on the other hand is constructed using the recursive embedding of matrix of order 4:
+where $\mathbf{u}_\textrm{N}^\textrm{T} = [1...1]$, and $\mathbf{I}_\textrm{N}$ is the identity matrix \cite{Jot:1997:icm}. The matrix of order 16 on the other hand, following \cite{PASPWEB2010}, is constructed using the recursive embedding of matrix of order 4:
 
 \begin{equation}
 \mathbf{A_{16}} = \frac{1}{2}
@@ -459,11 +458,11 @@ where $\mathbf{u}_\textrm{N}^\textrm{T} = [1...1]$, and $\mathbf{I}_\textrm{N}$ 
     \end{bmatrix}.
     \label{eq:embed}
 \end{equation}
-As a result, the matrix of order 16 consists of the same values, differing only in their sign \cite{PASPWEB2010}.
+As a result, the matrix of order 16 consists of the same values, differing only in their sign.
 
 
 \subsection{Code Structure}\label{sec:codeStructure}
-The plugin is divided into two main components that run on different threads at different rates. Firstly, the DSP component running at 44,100\,Hz (audio rate), is structured in the same fashion as shown in Fig.~\ref{fig:diag}. An \textit{FDN} class contains the scattering matrix $\textbf{A}$ and $N$ instances of the \textit{EQDelayLine} class. This class, in turn, contains a delay line of length $L_i$ (implemented as a circular buffer) and $M$ instances of the \textit{Filter} class. This class does all low level computation and contains the filter states and coefficients $b_{i,m}$ and $a_{i,m}$ of the $i$'th delay line and the $m$'th octave band.
+The plugin is divided into two main components that run on different threads at different rates. Firstly, the DSP component running at 44,100\,Hz (audio rate), is structured in the same fashion as shown in Fig.~\ref{fig:diag}. An \textit{FDN} class contains the scattering matrix $\textbf{A}$ and $N$ instances of the \textit{EQDelayLine} class. This class, in turn, contains a delay line of length $L_i$ (implemented as a circular buffer) and $M$ instances of the \textit{Filter} class. This class does all low level computation and contains the filter states and coefficients $b_{i,m}$ and $a_{i,m}$ of the $i$th delay line and the $m$th octave band.
 
 Secondly, the GUI component running at 5\, Hz is responsible for the graphics and control of the FDN. Apart from the controls, this component contains the \textit{Response} class that is used for drawing the RT and gain curves and the IR shown in Figs. \ref{fig:gui} and \ref{fig:gui2}. The filter coefficients needed for drawing the curves are updated at the aforementioned rate. This calculation also provides information about the stability of the FDN and is used to trigger the light-red background denoting instability. The \textit{Response} class also contains a single instance of the \textit{EQDelayLines} class that is used for drawing the IR.
 
@@ -474,37 +473,38 @@ Communication from the GUI to the DSP component happens at a 5\,Hz rate which ha
     \subfloat[\textit{Distribution of delay-line outputs for the option} Primes. ]{\label{fig:primes}{ \includegraphics[trim=4.2cm 8.8cm 4.2cm 9cm, width=0.42\textwidth]{Figures/primes.pdf}}} \hfill
     \subfloat[\textit{Distribution of delay-line outputs for the option} Uniform. ]{\label{fig:uniform}{ \includegraphics[trim=4.2cm 8.8cm 4.2cm 9cm, width=0.42\textwidth]{Figures/uniform.pdf}}} \hfill
     \subfloat[\textit{Distribution of delay-line outputs for the option} Random. ]{\label{fig:random}{ \includegraphics[trim=4.2cm 8.8cm 4.2cm 9cm, width=0.42\textwidth]{Figures/random.pdf}}} \hfill
-    \caption{\textit{The distribution of 32 delay-line outputs depending on the distribution option and length range. The circles mark the time unit in which the given delay-line outputs a sample. (Top panes) Pre-defined lengths (1,500--4,500 samples). (Middle panes) Randomised selection, whole range (500--10,000 samples). (Bottom panes) Randomised selection, narrow range (5,000--6,500 samples). \karolina{To do: add figures for the gaussian}
+    \caption{\textit{The distribution of 32 delay-line outputs depending on the distribution option and length range (assuming no scattering is present). The circles mark the time unit in which the given delay-line outputs a sample. (Top panes) Pre-defined lengths (1,500--4,500 samples). (Middle panes) Randomised selection, whole range (500--10,000 samples). (Bottom panes) Randomised selection, narrow range (5,000--6,500 samples). \karolina{To do: add figures for the gaussian}
     \vesa{Pls sort the delay lines from shorters to longest like in (b). Could a Matlab dot (.) look better than a circle?}}}
     \label{fig:dLens}
 \end{figure*}
 
 \subsection{Real-time Considerations}
-The components of the plugin requiring most computations are the (re-)calculation of the filter coefficients and the plotting of the responses. Even though the filter coefficients only need to be recalculated when slider values are changed, it is good practice for a plugin to have the same CPU usage when its values are changed as when its values are static to prevent unexpected spikes in the CPU usage. Instead, a \textit{Fix coeffs} (coefficients) button has been implemented that, when clicked, will deactivate the presets drop-down menu and the sliders. Furthermore, the plugin will stop recalculating the plots and filter coefficients at a 5-Hz rate, greatly decreasing CPU usage (see Sec.~\ref{sec:resDisc}). The CPU usages of each individual thread are shown at the top of the plugin.
+The components of the plugin requiring most computations are the (re-)calculation of the filter coefficients and the plotting of the responses. Even though the filter coefficients only need to be recalculated when slider values are changed, it is good practice for a plugin to have the same CPU usage when its values are changed as when its values are static to prevent unexpected spikes in the CPU usage. Instead, a \textit{Fix coeffs} (coefficients) button has been implemented that, when clicked, will deactivate the presets drop-down menu and the sliders (as shown in Fig.~\ref{fig:gui2}). Furthermore, the plugin will stop recalculating the plots and filter coefficients, greatly decreasing CPU usage (see Sec.~\ref{sec:resDisc} \silvin{$\leftarrow$ Would this be referring to the table of cpu usage that I still need to add?} \karolina{I thought that you put this here? I think I haven't written anything in this section}). The CPU usages of each individual thread are shown at the top of the plugin.
 
-When any change is made to the FDN, be it the order, delay-line distribution or length, the delay lines and filter states are set to zero to prevent any unwanted artefacts. Only the RT control works in real time without emptying the delay lines.
+When any change is made to the FDN, be it the order, delay-line distribution or length, the delay lines and filter states are set to zero to prevent any unwanted artefacts. Only the RT control works in real time without emptying the delay lines and filter states.
 
 \section{Results and Discussion}\label{sec:resDisc}
-To achieve smooth reverberation, a sufficient echo density, i.e., the number of echoes produced by the algorithm and their distribution \cite{schlecht:2016:echo}, should be obtained. Echo density is affected by a few factors, such as the lengths and the distribution of the delay lines, the type of the feedback matrix and its size. 
 
-\subsection{Behavior with Different Choices of Delay Lines}
-The practice of choosing mutually prime delay-line lengths is aimed at avoiding more than one sample appearing at the system's output at the same time, and clustering the echoes, since both of these phenomena lower the echo density. Using the relatively prime delays does not, however, always ensure smooth reverberation. Their distribution and the range over which they are chosen are also the factors affecting the quality of the synthesised sound. The distribution of delay-line outputs over time, assuming no scattering is present, is shown in Fig.~\ref{fig:dLens} for all the options available in the plugin. The delay-line lengths were sorted in an ascending order. \vesa{Pls talk the reader through this figure, as it is not self-explanatory. Why are delay lines sorted from shortest to longest only in Fig.~4(b)?}
+This section will present results regarding the echo density produced by the implementation and plugin's CPU usage and discuss these.
+
+\subsection{Echo Density}
+To achieve smooth reverberation, a sufficient echo density, i.e., the number of echoes per time unit produced by the algorithm and their distribution \cite{schlecht:2016:echo}, should be obtained. Echo density is affected by a few factors, such as the lengths and the distribution of the delay lines, the type of the feedback matrix and its size, all of which is discussed below.
+
+\subsubsection{Behavior with Different Choices of Delay Lines}
+The practice of choosing mutually prime delay-line lengths is aimed at avoiding more than one sample appearing at the system's output at the same time, and clustering the echoes, since both of these phenomena lower the echo density. Using the relatively prime delays \silvin{$\leftarrow$ Using this delay-line distribution (?)} does not, however, always ensure smooth reverberation. Their distribution and the range over which they are chosen are also the factors affecting the quality of the synthesised sound. The distribution of delay-line outputs over time, assuming no scattering is present, is shown in Fig.~\ref{fig:dLens} for all the options available in the plugin. The delay-line lengths were sorted in an ascending order. \vesa{Pls talk the reader through this figure, as it is not self-explanatory. Why are delay lines sorted from shortest to longest only in Fig.~4(b)?}
 
 The top panes of the Figures~\ref{fig:primes}.-\ref{fig:random}. show that when the range over which the delay-line lengths are chosen is balanced, the system outputs samples \karolina{to finish}.
 
 The distribution of outputs presented in the middle panes show that when the delay-lengths range is very wide, very short delay lines create clusters of echoes and huge portion of the output samples overlap. they do not contribute to the increase of echo density, but nevertheless add to the computation. Such clusters are well visible in Fig.~\ref{fig:primes} and~\ref{fig:random}. On the other hand, very long delay lines (10,000 samples translates to ca. 0.23\,s) in case of low RT values may not introduce meaningful contribution to the synthesised reverb. However, such long delay lines still add the computation, since the size of the feedback matrix needs to be equal to the number of delay lines. 
 
-Very narrow range over which the delay-line lengths are distributed results in clusters of samples arriving at the output within very short time, as depicted in the bottom panes of Fig.~\ref{fig:dLens}. Between the consecutive clusters, however, long periods of zeros occur. This results in low-quality sound with clearly audible segmentation. 
+Using a very narrow range over which the delay-line lengths are distributed results in clusters of samples arriving at the output within very short time, as depicted in the bottom panes of Fig.~\ref{fig:dLens}. Between the consecutive clusters, however, long periods of zeros occur. This results in low-quality sound with clearly audible segmentation. \silvin{Using this range, the effect resembles more a delay than a reverb.}
 
-
-
-
-\subsection{Effect of Feedback Matrix on Echo Density}
+\subsubsection{Effect of Feedback Matrix on Echo Density}
 
 The normalized echo densities for all types of matrices available in the plugin were calculated for orders 2--64 and the delay lines selected randomly %from a uniform distribution 
-from the range between 1,500 and 4,500 samples (the same set of delay lines was used for all calculations) \cite{abel:2006, huang:2007, huang:2008}. The results are presented in Fig.~\ref{fig:echo}. which generally shows that the echo density increases faster with a higher FDN order than with a lower one. 
+from the range between 1,500 and 4,500 samples (the same set of delay lines was used for all calculations) \cite{abel:2006, huang:2007, huang:2008} \silvin{Unsure what these references refer to.. the range, explanation of echo density, the calculation..? If the latter is true, maybe you can put these here: "... were calculated, following [26, 27, 28], for orders 2--64..."}. The results are presented in Fig.~\ref{fig:echo} which generally show that the echo density increases faster with a higher FDN order than with a lower one. 
 
-When the matrices of size 2 and 4 are used, the number of echoes in the output of the reverberator increases slowly and may never reach saturation, i.e. a moment, when there is an echo at every successive time unit \cite{schlecht:2016:echo}. Therefore, those low orders do not produce smooth sound. In case of FDN of order 8, the echo density build-up is slow, which results in audible artifacts in synthesized reverbs for as long as one second. Thus, a matrix of size 16 is the smallest that increases the number of echoes quickly enough so that the resulting sound is perceived as smooth. For the Hadamard and random matrices, further rise in the size accelerates the echo density build-up, as depicted in Fig.~\ref{fig:echoHad} and~\ref{fig:echoRand}.
+When matrices of size 2 and 4 are used, the number of echoes in the output of the reverberator increases slowly and may never reach saturation, i.e. a moment, when there is an echo at every successive time unit \cite{schlecht:2016:echo}. Therefore, those low orders do not produce smooth sound. In the case of an FDN of order 8, the echo density build-up is slow, which results in audible artifacts in synthesized reverbs for as long as one second. Thus, a matrix of size 16 is the smallest that increases the number of echoes quickly enough so that the resulting sound is perceived as smooth for all matrix-types (except for the identity matrix). For the Hadamard and random matrices, further rise in the size accelerates the echo density build-up, as depicted in Fig.~\ref{fig:echoHad} and~\ref{fig:echoRand}.
 
 Interestingly, the Householder matrix excels with the order of 16 using the recursive embedding shown in Eq.~\eqref{eq:embed}. This can be explained by the fact that for all other orders the implementation is according to Eq.~\eqref{eq:house} which produces matrices in which the difference between the diagonal and the rest of the elements grows proportional to the order. Effectively, this makes the FDN approach a bank of decoupled comb filters. This results in high variability of echo density for orders 32 and 64, as depicted in Fig.~\ref{fig:echoHouse} and leads to audible artifacts in the reverberation. For the matrix of order 16, however the echo density increases faster and is more stable once it reaches saturation.
 
@@ -515,16 +515,13 @@ Because of the fact that the identity matrices produce a very low echo density t
     \subfloat[\textit{Householder matrix.}]{\label{fig:echoHouse}{ \includegraphics[trim=4.cm 9.2cm 4.2cm 10cm, width=0.4\textwidth]{Figures/echoHouse.pdf}}} \hfill
     \subfloat[\textit{Hadamard matrix.}]{\label{fig:echoHad}{ \includegraphics[trim=3.8cm 9.2cm 4.5cm 10cm, width=0.4\textwidth]{Figures/echoHad.pdf}}} \hfill
     \subfloat[\textit{Random orthogonal matrix.}]{\label{fig:echoRand}{ \includegraphics[trim=3.8cm 9.2cm 4.5cm 10cm, width=0.4\textwidth]{Figures/echoRand.pdf}}} \hfill
-    \caption{\textit{Normalized echo densities for four types of feedback matrices and different FDN orders. \silvin{I see! Another comment, if we choose the same order as we do in the plugin (Hadamard, Householder, Identity and Random) we can put the legend in the bottom right (random). I feel that's less arbitrary than using sub-figure c). \karolina{yes, I will change that! the legend is left from the previous order of figures, forgot to take care of it!} \silvin{Cool! Understood :)}}
-    \vesa{I find it hard to notice the different between the lines of 16 and 64, which are both dark. Could you use 3 times thicker line for 16, 32 and 64, which get mixed, pls?} \karolina{correcting those figures right now}
-    \vesa{Also showing only the beginning of the curves up to 1 sec, for example, would help the comparison.} \karolina{all done now :) I chose 1.2 s because sometimes order 8 saturates just after 1 s}
-    }}
+    \caption{\textit{Normalized echo densities for four types of feedback matrices and different FDN orders. }}
     \label{fig:echo}
 \end{figure*}
 
-No user test
+\subsection{CPU Usage}
 
-Table with CPU usages for different FDN orders with and without the fixed coeffs button activated.
+$<$\textit{insert table with CPU usages for different FDN orders with and without the fixed coeffs button activated.}$>$
 
 \section{Conclusions}
 
